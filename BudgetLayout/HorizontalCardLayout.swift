@@ -1,5 +1,5 @@
 //
-//  VerticalBudgetLayout.swift
+//  HorizontalCardLayout.swift
 //  BudgetLayout
 //
 //  Created by Srivinayak Chaitanya Eshwa on 23/05/20.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class VerticalCardLayout: CardLayout {
+class HorizontalCardLayout: CardLayout {
     
     private weak var budgetList: BudgetList?
     
@@ -29,7 +29,7 @@ class VerticalCardLayout: CardLayout {
     
     weak var grabbedCardView: CardView?
     
-    private var grabbedCardViewOriginalY: CGFloat = 0
+    private var grabbedCardViewOriginalX: CGFloat = 0
     
     // MARK: Layout Properties for all in stack
     
@@ -392,11 +392,11 @@ class VerticalCardLayout: CardLayout {
         self.scrollView?.isScrollEnabled = false
         
         self.grabbedCardView = cardView
-        self.grabbedCardViewOriginalY = cardView.frame.minY - (popup ? self.grabPopupOffset : 0)
+        self.grabbedCardViewOriginalX = cardView.frame.minY - (popup ? self.grabPopupOffset : 0)
         
         if popup {
             var cardViewFrame = cardView.frame
-            cardViewFrame.origin.y = grabbedCardViewOriginalY
+            cardViewFrame.origin.y = grabbedCardViewOriginalX
             
             UIView.animate(withDuration: Constants.grabbingAnimationDuration, delay: 0, options: [.beginFromCurrentState, .curveEaseInOut], animations: { [weak self] in
                 self?.grabbedCardView?.frame = cardViewFrame
@@ -408,7 +408,7 @@ class VerticalCardLayout: CardLayout {
     func updateGrabbedCardView(to offset: CGPoint) {
         
         var cardViewFrame = self.grabbedCardView?.frame ?? CGRect.zero
-        cardViewFrame.origin.y = self.grabbedCardViewOriginalY + offset.y
+        cardViewFrame.origin.y = self.grabbedCardViewOriginalX + offset.y
         self.grabbedCardView?.frame = cardViewFrame
         
     }
@@ -425,7 +425,7 @@ class VerticalCardLayout: CardLayout {
         
         if let grabbedCardView = self.grabbedCardView,
             grabbedCardView == self.presentedCardView && grabbedCardView.isPresented == true,
-            grabbedCardView.frame.origin.y > self.grabbedCardViewOriginalY + self.cardViewHeight / 4 {
+            grabbedCardView.frame.origin.y > self.grabbedCardViewOriginalX + self.cardViewHeight / 4 {
             
             let presentationCenter = budgetList.convert(self.presentationCenter, from: self.scrollView)
             let yPoints = budgetList.frame.maxY - (presentationCenter.y - self.cardViewHeight / 2)
@@ -438,7 +438,7 @@ class VerticalCardLayout: CardLayout {
             }
         } else if let grabbedCardView = self.grabbedCardView,
             presentedCardView == nil && grabbedCardView.isPresented == false,
-            grabbedCardView.frame.origin.y < grabbedCardViewOriginalY - cardViewHeight / 4 {
+            grabbedCardView.frame.origin.y < grabbedCardViewOriginalX - cardViewHeight / 4 {
             self.present(grabbedCardView, animated: true)
         } else {
             self.layoutCards(animationDuration: Constants.grabbingAnimationDuration)

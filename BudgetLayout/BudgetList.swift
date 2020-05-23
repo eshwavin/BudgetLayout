@@ -27,16 +27,16 @@ class BudgetList: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.currentLayout = VerticalCardLayout(scrollView: self.scrollView, budgetList: self)
-        self.currentLayout?.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
         self.prepareScrollView()
+        self.setContentInsets()
         self.addObservers()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         self.currentLayout = VerticalCardLayout(scrollView: self.scrollView, budgetList: self)
-        self.currentLayout?.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
         self.prepareScrollView()
+        self.setContentInsets()
         self.addObservers()
     }
     
@@ -55,6 +55,10 @@ class BudgetList: UIView {
         self.scrollView.autoresizingMask = [.flexibleTopMargin, .flexibleLeftMargin, .flexibleHeight, .flexibleWidth]
         self.scrollView.frame = self.bounds
         
+    }
+    
+    private func setContentInsets() {
+        self.currentLayout?.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
     }
     
     // MARK: Observers

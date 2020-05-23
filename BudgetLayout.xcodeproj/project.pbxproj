@@ -18,6 +18,7 @@
 		11DB97702478A9D300F41E4B /* VerticalCardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DB976F2478A9D300F41E4B /* VerticalCardLayout.swift */; };
 		11DB97722478AA2900F41E4B /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DB97712478AA2900F41E4B /* CardView.swift */; };
 		11DB97742479820400F41E4B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DB97732479820400F41E4B /* Constants.swift */; };
+		11DB97762479826800F41E4B /* HorizontalCardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DB97752479826800F41E4B /* HorizontalCardLayout.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		11DB976F2478A9D300F41E4B /* VerticalCardLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalCardLayout.swift; sourceTree = "<group>"; };
 		11DB97712478AA2900F41E4B /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		11DB97732479820400F41E4B /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		11DB97752479826800F41E4B /* HorizontalCardLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalCardLayout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 				11DB97712478AA2900F41E4B /* CardView.swift */,
 				11DB976B2478A7F500F41E4B /* BudgetList.swift */,
 				11DB976F2478A9D300F41E4B /* VerticalCardLayout.swift */,
+				11DB97752479826800F41E4B /* HorizontalCardLayout.swift */,
 				11DB976D2478A84500F41E4B /* CardLayout.swift */,
 				11DB97732479820400F41E4B /* Constants.swift */,
 				11DB975D2478A7A700F41E4B /* Main.storyboard */,
@@ -156,6 +159,7 @@
 				11DB97722478AA2900F41E4B /* CardView.swift in Sources */,
 				11DB976E2478A84500F41E4B /* CardLayout.swift in Sources */,
 				11DB975C2478A7A700F41E4B /* ViewController.swift in Sources */,
+				11DB97762479826800F41E4B /* HorizontalCardLayout.swift in Sources */,
 				11DB97702478A9D300F41E4B /* VerticalCardLayout.swift in Sources */,
 				11DB97582478A7A700F41E4B /* AppDelegate.swift in Sources */,
 				11DB976C2478A7F500F41E4B /* BudgetList.swift in Sources */,
