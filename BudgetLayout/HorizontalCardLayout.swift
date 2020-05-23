@@ -66,13 +66,18 @@ class HorizontalCardLayout: CardLayout {
     
     var presentationCenter: CGPoint {
         
-        let centerRect = CGRect(x: 0, y: cardViewTopInset,
-                                width: self.budgetList!.frame.width,
-                                height: self.budgetList!.frame.height - self.collapsedCardViewStackHeight - self.cardViewTopInset)
+        guard let budgetList = budgetList, let scrollView = scrollView else {
+            return CGPoint.zero
+        }
         
-        return self.scrollView?.convert(CGPoint(x: centerRect.midX, y: centerRect.midY), from: self.budgetList) ?? CGPoint.zero
+        let centerRect = CGRect(x: self.cardViewLeadingInset, y: self.cardViewTopInset,
+                                width: self.cardViewWidth,
+                                height: budgetList.frame.height - self.collapsedCardViewStackHeight - self.cardViewTopInset)
+        
+        return scrollView.convert(CGPoint(x: centerRect.midX, y: centerRect.midY), from: self.budgetList)
         
     }
+
     
     // MARK: Setup
     
