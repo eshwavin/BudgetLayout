@@ -393,11 +393,11 @@ class HorizontalCardLayout: CardLayout {
         self.scrollView?.isScrollEnabled = false
         
         self.grabbedCardView = cardView
-        self.grabbedCardViewOriginalX = cardView.frame.minY - (popup ? self.grabPopupOffset : 0)
+        self.grabbedCardViewOriginalX = cardView.frame.minX - (popup ? self.grabPopupOffset : 0)
         
         if popup {
             var cardViewFrame = cardView.frame
-            cardViewFrame.origin.y = grabbedCardViewOriginalX
+            cardViewFrame.origin.x = grabbedCardViewOriginalX
             
             UIView.animate(withDuration: Constants.grabbingAnimationDuration, delay: 0, options: [.beginFromCurrentState, .curveEaseInOut], animations: { [weak self] in
                 self?.grabbedCardView?.frame = cardViewFrame
@@ -409,7 +409,7 @@ class HorizontalCardLayout: CardLayout {
     func updateGrabbedCardView(to offset: CGPoint) {
         
         var cardViewFrame = self.grabbedCardView?.frame ?? CGRect.zero
-        cardViewFrame.origin.y = self.grabbedCardViewOriginalX + offset.y
+        cardViewFrame.origin.x = self.grabbedCardViewOriginalX + offset.x
         self.grabbedCardView?.frame = cardViewFrame
         
     }
@@ -426,12 +426,12 @@ class HorizontalCardLayout: CardLayout {
         
         if let grabbedCardView = self.grabbedCardView,
             grabbedCardView == self.presentedCardView && grabbedCardView.isPresented == true,
-            grabbedCardView.frame.origin.y > self.grabbedCardViewOriginalX + self.cardViewHeight / 4 {
+            grabbedCardView.frame.origin.x > self.grabbedCardViewOriginalX + self.cardViewWidth / 4 {
             
             let presentationCenter = budgetList.convert(self.presentationCenter, from: self.scrollView)
-            let yPoints = budgetList.frame.maxY - (presentationCenter.y - self.cardViewHeight / 2)
-            let velocityY = grabbedCardView.panGestureRecognizer.velocity(in: grabbedCardView).y
-            let animationDuration = min(Constants.dismissingAnimationDuration * 1.5, TimeInterval(yPoints / velocityY))
+            let xPoints = budgetList.frame.maxX - (presentationCenter.x - self.cardViewWidth / 2)
+            let velocityX = grabbedCardView.panGestureRecognizer.velocity(in: grabbedCardView).x
+            let animationDuration = min(Constants.dismissingAnimationDuration * 1.5, TimeInterval(xPoints / velocityX))
             if self.cardViews.count > 1 {
                 self.dismissPresentedCardView(true, animationDuration: animationDuration)
             } else {
@@ -439,7 +439,7 @@ class HorizontalCardLayout: CardLayout {
             }
         } else if let grabbedCardView = self.grabbedCardView,
             presentedCardView == nil && grabbedCardView.isPresented == false,
-            grabbedCardView.frame.origin.y < grabbedCardViewOriginalX - cardViewHeight / 4 {
+            grabbedCardView.frame.origin.x < grabbedCardViewOriginalX - self.cardViewWidth / 4 {
             self.present(grabbedCardView, animated: true)
         } else {
             self.layoutCards(animationDuration: Constants.grabbingAnimationDuration)

@@ -97,7 +97,14 @@ class CardView: UIView {
     
     private func updateGrabbedCardViewOffset(using gestureRecognizer: UIPanGestureRecognizer) {
         let offset = gestureRecognizer.translation(in: self.budgetList)
-        if self.isPresented && offset.y > 0 {
+        
+        var directionalOffset = offset.y
+        
+        if let _ = self.budgetList?.currentLayout as? HorizontalCardLayout {
+            directionalOffset = offset.x
+        }
+        
+        if self.isPresented && directionalOffset > 0 {
             self.budgetList?.currentLayout?.updateGrabbedCardView(to: offset)
         } else if !self.isPresented {
             self.budgetList?.currentLayout?.updateGrabbedCardView(to: offset)
