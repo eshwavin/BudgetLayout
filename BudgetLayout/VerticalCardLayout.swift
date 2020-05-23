@@ -186,15 +186,13 @@ class VerticalCardLayout: CardLayout {
         
         var cardViewYPoint: CGFloat = 0
         
-        let cardViewHeight = self.cardViewHeight
-        
         let firstCardView = self.cardViews.first
         
         for cardViewIndex in 0..<self.cardViews.count {
             
             let cardView = self.cardViews[cardViewIndex]
             
-            var cardViewFrame = CGRect(x: self.cardViewLeadingInset, y: max(cardViewYPoint, zeroRectConvertedFromWalletViewOriginY), width: self.cardViewWidth, height: cardViewHeight)
+            var cardViewFrame = CGRect(x: self.cardViewLeadingInset, y: max(cardViewYPoint, zeroRectConvertedFromWalletViewOriginY), width: self.cardViewWidth, height: self.cardViewHeight)
             
             if cardView == firstCardView {
                 

@@ -18,15 +18,30 @@ class BudgetList: UIView {
         }
     }
     
-    var currentLayout: CardLayout?
+    var currentLayout: CardLayout? {
+        didSet {
+            self.currentLayout?.insert(cardViews: self.cardViews)
+            self.setContentInsets()
+        }
+    }
     
     private static var observerContext = 0
+    
+    // MARK: Layout Properties
+    
+    lazy var verticalCardLayout: VerticalCardLayout = {
+        return VerticalCardLayout(scrollView: self.scrollView, budgetList: self)
+    }()
+    
+    lazy var horizontalCardLayout: HorizontalCardLayout = {
+        return HorizontalCardLayout(scrollView: self.scrollView, budgetList: self)
+    }()
     
     // MARK: Initialisation
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.currentLayout = VerticalCardLayout(scrollView: self.scrollView, budgetList: self)
+        self.setCardLayout()
         self.prepareScrollView()
         self.setContentInsets()
         self.addObservers()
@@ -34,20 +49,35 @@ class BudgetList: UIView {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        self.currentLayout = VerticalCardLayout(scrollView: self.scrollView, budgetList: self)
+        self.setCardLayout()
         self.prepareScrollView()
         self.setContentInsets()
         self.addObservers()
     }
     
+    private func setCardLayout() {
+        switch (traitCollection.verticalSizeClass, traitCollection.horizontalSizeClass) {
+        case (_, .compact):
+            self.currentLayout = self.verticalCardLayout
+            self.scrollView.alwaysBounceVertical = true
+            self.scrollView.alwaysBounceHorizontal = false
+        case (.compact, _):
+            self.currentLayout = self.horizontalCardLayout
+            self.scrollView.alwaysBounceVertical = false
+            self.scrollView.alwaysBounceHorizontal = true
+        case (.regular, .regular):
+            () // TODO: Grid / Split Layout
+        default:
+            ()
+        }
+        
+    }
     
     private func prepareScrollView() {
         
         self.addSubview(self.scrollView)
         
         self.scrollView.clipsToBounds = false
-        
-        self.scrollView.alwaysBounceVertical = true
         
         self.scrollView.showsHorizontalScrollIndicator = false
         self.scrollView.showsVerticalScrollIndicator = false
@@ -58,8 +88,11 @@ class BudgetList: UIView {
     }
     
     private func setContentInsets() {
+        
+        
         self.currentLayout?.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
     }
+    
     
     // MARK: Observers
     
@@ -85,9 +118,16 @@ class BudgetList: UIView {
         }
     }
     
+    // MARK: Handling Orientation Changes
+    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        print("trait collection did change in Budget List")
-        // change the layout here
+        
+        guard traitCollection != previousTraitCollection else {
+            return
+        }
+        
+        self.setCardLayout()
+        
     }
     
 }

@@ -35,7 +35,7 @@ class HorizontalCardLayout: CardLayout {
     
     public var contentInset: UIEdgeInsets {
         set {
-            self.scrollView?.contentInset = UIEdgeInsets(top: newValue.top, left: 0, bottom: 0, right: 0 )
+            self.scrollView?.contentInset = UIEdgeInsets(top: 0, left: newValue.left, bottom: 0, right: 0 )
             self.cardViewTopInset = newValue.top
             self.cardViewLeadingInset = newValue.left
             self.cardViewTrailingInset = newValue.right
@@ -70,9 +70,7 @@ class HorizontalCardLayout: CardLayout {
             return CGPoint.zero
         }
         
-        let centerRect = CGRect(x: self.cardViewLeadingInset, y: self.cardViewTopInset,
-                                width: self.cardViewWidth,
-                                height: budgetList.frame.height - self.collapsedCardViewStackHeight - self.cardViewTopInset)
+        let centerRect = CGRect(x: self.cardViewLeadingInset, y: self.cardViewTopInset, width: budgetList.frame.width - self.collapsedCardViewStackHeight - self.cardViewLeadingInset, height: self.cardViewHeight)
         
         return scrollView.convert(CGPoint(x: centerRect.midX, y: centerRect.midY), from: self.budgetList)
         
@@ -102,8 +100,8 @@ class HorizontalCardLayout: CardLayout {
         
         self.collapsedCardViewStackHeight = self.minimumDistanceBetweenCollapsedCardViews * CGFloat(self.maximumNumberOfCollapsedCardViewsToShow) + self.distanceBetweenCollapsedAndPresentedCardViews
         
-        self.cardViewHeight = budgetList.frame.height - (self.cardViewTopInset + self.collapsedCardViewStackHeight)
-        self.cardViewWidth = budgetList.frame.width - (self.cardViewTrailingInset + self.cardViewLeadingInset)
+        self.cardViewHeight = budgetList.frame.height - (self.cardViewTopInset + self.cardViewBottomInset)
+        self.cardViewWidth = budgetList.frame.width - (self.cardViewTrailingInset + self.collapsedCardViewStackHeight)
         
         self.distanceBetweenCardViews = self.minimumDistanceBetweenStackedCardViews
         
@@ -120,9 +118,9 @@ class HorizontalCardLayout: CardLayout {
             return
         }
         
-        var contentSize = CGSize(width: budgetList.frame.width, height: 0)
+        var contentSize = CGSize(width: 0, height: budgetList.frame.height)
         
-        contentSize.height = (self.cardViews.last?.frame.maxY ?? 0) - (self.cardViewHeight / 2)
+        contentSize.width = (self.cardViews.last?.frame.maxX ?? 0) - (self.cardViewWidth / 2)
         
         if !contentSize.equalTo(scrollView?.contentSize ?? CGSize.zero) {
             self.scrollView?.contentSize = contentSize
@@ -167,27 +165,25 @@ class HorizontalCardLayout: CardLayout {
         
         self.scrollView?.isScrollEnabled = true
         
-        let zeroRectConvertedFromWalletViewOriginY: CGFloat = {
+        let zeroRectConvertedFromWalletViewOriginX: CGFloat = {
             var rect = budgetList.convert(CGRect.zero, to: scrollView)
-            rect.origin.y += self.scrollView?.contentInset.top ?? 0
-            return rect.origin.y
+            rect.origin.x += self.cardViewLeadingInset
+            return rect.origin.x
         }()
         
         let stretchingDistance: CGFloat? = {
             
-            let negativeScrollViewContentInsetTop = -(self.scrollView?.contentInset.top ?? 0)
-            let scrollViewContentOffsetY = self.scrollView?.contentOffset.y ?? 0
+            let negativeScrollViewContentInsetLeft = -(self.cardViewLeadingInset)
+            let scrollViewContentOffsetX = self.scrollView?.contentOffset.x ?? 0
             
-            if negativeScrollViewContentInsetTop > scrollViewContentOffsetY {
-                return abs(abs(negativeScrollViewContentInsetTop) + scrollViewContentOffsetY)
+            if negativeScrollViewContentInsetLeft > scrollViewContentOffsetX {
+                return abs(abs(negativeScrollViewContentInsetLeft) + scrollViewContentOffsetX)
             }
             
             return nil
         }()
         
-        var cardViewYPoint: CGFloat = 0
-        
-        let cardViewHeight = self.cardViewHeight
+        var cardViewXPoint: CGFloat = 0
         
         let firstCardView = self.cardViews.first
         
@@ -195,23 +191,23 @@ class HorizontalCardLayout: CardLayout {
             
             let cardView = self.cardViews[cardViewIndex]
             
-            var cardViewFrame = CGRect(x: self.cardViewLeadingInset, y: max(cardViewYPoint, zeroRectConvertedFromWalletViewOriginY), width: self.cardViewWidth, height: cardViewHeight)
+            var cardViewFrame = CGRect(x: max(cardViewXPoint, zeroRectConvertedFromWalletViewOriginX), y: self.cardViewTopInset, width: self.cardViewWidth, height: self.cardViewHeight)
             
             if cardView == firstCardView {
                 
-                cardViewFrame.origin.y = min(cardViewFrame.origin.y, zeroRectConvertedFromWalletViewOriginY)
+                cardViewFrame.origin.x = min(cardViewFrame.origin.x, zeroRectConvertedFromWalletViewOriginX)
                 cardView.frame = cardViewFrame
                 
             } else {
                 
                 if let stretchingDistance = stretchingDistance {
-                    cardViewFrame.origin.y += stretchingDistance * CGFloat((cardViewIndex - 1))
+                    cardViewFrame.origin.x += stretchingDistance * CGFloat((cardViewIndex - 1))
                 }
                 
                 cardView.frame = cardViewFrame
             }
             
-            cardViewYPoint += self.distanceBetweenCardViews
+            cardViewXPoint += self.distanceBetweenCardViews
             
         }
         
@@ -224,8 +220,8 @@ class HorizontalCardLayout: CardLayout {
         }
         self.scrollView?.isScrollEnabled = false
         
-        let scrollViewFrameMaxY = (self.scrollView?.convert(CGPoint(x: 0, y: scrollView?.frame.maxY ?? 0), from: budgetList).y) ?? 0
-        var cardViewYPoint = scrollViewFrameMaxY - self.collapsedCardViewStackHeight + self.distanceBetweenCollapsedAndPresentedCardViews
+        let scrollViewFrameMaxX = (self.scrollView?.convert(CGPoint(x: self.scrollView?.frame.maxX ?? 0, y: 0), from: budgetList).x) ?? 0
+        var cardViewXPoint = scrollViewFrameMaxX - self.collapsedCardViewStackHeight + self.distanceBetweenCollapsedAndPresentedCardViews
         
         let firstIndexToMove: Int = {
             guard let presentedCardView = self.presentedCardView,
@@ -246,18 +242,18 @@ class HorizontalCardLayout: CardLayout {
         for cardViewIndex in 0..<self.cardViews.count {
             
             let cardView = self.cardViews[cardViewIndex]
-            var cardViewFrame = CGRect(x: self.cardViewLeadingInset, y: scrollViewFrameMaxY + (self.collapsedCardViewStackHeight * 2), width: self.cardViewWidth, height: self.cardViewHeight)
+            var cardViewFrame = CGRect(x: scrollViewFrameMaxX + (self.collapsedCardViewStackHeight * 2), y: self.cardViewTopInset, width: self.cardViewWidth, height: self.cardViewHeight)
             
             if cardViewIndex >= firstIndexToMove && collapsedCardViewsCount > 0 {
                 if self.presentedCardView != cardView || collapsePresentedCardView {
                     
-                    let widthDelta = self.minimumDistanceBetweenCollapsedCardViews * CGFloat(collapsedCardViewsCount) / 2
-                    cardViewFrame.size.width -= widthDelta
-                    cardViewFrame.origin.x += widthDelta / 2
+                    let heightDelta = self.minimumDistanceBetweenCollapsedCardViews * CGFloat(collapsedCardViewsCount) / 2
+                    cardViewFrame.size.height -= heightDelta
+                    cardViewFrame.origin.y += heightDelta / 2
                     
                     collapsedCardViewsCount -= 1
-                    cardViewFrame.origin.y = cardViewYPoint
-                    cardViewYPoint += self.minimumDistanceBetweenCollapsedCardViews
+                    cardViewFrame.origin.x = cardViewXPoint
+                    cardViewXPoint += self.minimumDistanceBetweenCollapsedCardViews
                     
                 }
             }
@@ -293,16 +289,16 @@ class HorizontalCardLayout: CardLayout {
                 continue
             }
             
-            let cardViewMinY = cardView.frame.minY
+            let cardViewMinX = cardView.frame.minX
             
             if cardView == self.presentedCardView {
                 cardViewIndex[CGFloat.greatestFiniteMagnitude] = (index, cardView)
                 continue
-            } else if let previousCardView = cardViewIndex[cardViewMinY]?.cardView { // check why?
+            } else if let previousCardView = cardViewIndex[cardViewMinX]?.cardView { // check why?
                 cardViewsToRemoveFromScrollView.append(previousCardView)
             }
             
-            cardViewIndex[cardViewMinY] = (index, cardView)
+            cardViewIndex[cardViewMinX] = (index, cardView)
             
             cardViewsToRemoveFromScrollView.forEach { $0.removeFromSuperview() } // remove non-visible card views
             
