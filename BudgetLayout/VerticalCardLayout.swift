@@ -108,7 +108,7 @@ class VerticalCardLayout: CardLayout {
         
     }
     
-    func updateContentSize() {
+    private func updateContentSize() {
         
         guard let budgetList = budgetList else {
             return
@@ -153,7 +153,7 @@ class VerticalCardLayout: CardLayout {
         
     }
     
-    func makeStackLayout() {
+    private func makeStackLayout() {
         
         guard let budgetList = budgetList else {
             return
@@ -211,7 +211,7 @@ class VerticalCardLayout: CardLayout {
         
     }
     
-    func makeCollapseLayout(collapsePresentedCardView: Bool) {
+    private func makeCollapseLayout(collapsePresentedCardView: Bool) {
         
         guard let budgetList = budgetList else {
             return
@@ -266,7 +266,7 @@ class VerticalCardLayout: CardLayout {
         
     }
     
-    func placeVisibleCardViews() {
+    private func placeVisibleCardViews() {
         
         guard let budgetList = budgetList else {
             return
@@ -339,7 +339,7 @@ class VerticalCardLayout: CardLayout {
         
     }
     
-    func present(_ cardView: CardView, animated: Bool, animationDuration: TimeInterval? = nil, completion: ((Bool) -> ())? = nil) {
+    private func present(_ cardView: CardView, animated: Bool, animationDuration: TimeInterval? = nil, completion: ((Bool) -> ())? = nil) {
         if cardView == self.presentedCardView {
             completion?(true)
             return
@@ -359,13 +359,13 @@ class VerticalCardLayout: CardLayout {
         
     }
     
-    open func dismissPresentedCardView(_ animated: Bool, completion: ((Bool) -> ())? = nil) {
+    func dismissPresentedCardView(_ animated: Bool, completion: ((Bool) -> ())? = nil) {
         
         self.dismissPresentedCardView(animated, animationDuration: animated ? Constants.dismissingAnimationDuration : nil, completion: completion)
         
     }
     
-    func dismissPresentedCardView(_ animated: Bool, animationDuration: TimeInterval?, completion: ((Bool) -> ())? = nil) {
+    private func dismissPresentedCardView(_ animated: Bool, animationDuration: TimeInterval?, completion: ((Bool) -> ())? = nil) {
         
         if self.cardViews.count <= 1 || self.presentedCardView == nil {
             completion?(true)
