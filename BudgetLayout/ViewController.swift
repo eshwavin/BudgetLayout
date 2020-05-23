@@ -10,11 +10,29 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var budgetView: BudgetList!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        self.setupWalletView()
     }
-
+    
+    
+    private func setupWalletView() {
+        
+        var cardViews: [CardView] = []
+        let colors = [UIColor.systemPurple, UIColor.systemBlue, UIColor.systemYellow, UIColor.systemPink, UIColor.systemIndigo, UIColor.systemGreen]
+        
+        for color in colors {
+            let cardView = CardView()
+            cardView.backgroundColor = color
+            cardViews.append(cardView)
+            
+        }
+        
+        self.budgetView.cardViews = cardViews
+        
+    }
 
 }
 
