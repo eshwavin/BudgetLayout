@@ -59,7 +59,7 @@ class BudgetList: UIView {
     
     // MARK: Miscellaneous Properties
     
-    private var didLayoutSubViewsForTheFirstTime: Bool = false
+//    private var didLayoutSubViewsForTheFirstTime: Bool = false
     private static var observerContext = 0
     
     // MARK: Layout Properties
@@ -104,9 +104,7 @@ class BudgetList: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        if !didLayoutSubViewsForTheFirstTime {
-            self.currentLayout?.calculateLayoutValues()
-        }
+        self.currentLayout?.calculateLayoutValues()
     }
     
     private func prepareScrollView() {
@@ -250,8 +248,6 @@ class BudgetList: UIView {
     // MARK: Handling Orientation Changes
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        
-        self.didLayoutSubViewsForTheFirstTime = true
         
         if traitCollection.horizontalSizeClass == previousTraitCollection?.horizontalSizeClass && traitCollection.verticalSizeClass == previousTraitCollection?.verticalSizeClass {
             return
