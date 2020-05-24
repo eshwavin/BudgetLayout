@@ -101,7 +101,7 @@ class HorizontalCardLayout: CardLayout {
         self.collapsedCardViewStackHeight = self.minimumDistanceBetweenCollapsedCardViews * CGFloat(self.maximumNumberOfCollapsedCardViewsToShow) + self.distanceBetweenCollapsedAndPresentedCardViews
         
         self.cardViewHeight = budgetList.frame.height - (self.cardViewTopInset + self.cardViewBottomInset)
-        self.cardViewWidth = budgetList.frame.width - (self.cardViewTrailingInset + self.collapsedCardViewStackHeight)
+        self.cardViewWidth = budgetList.frame.width - (self.cardViewTrailingInset + self.cardViewLeadingInset + self.collapsedCardViewStackHeight)
         
         self.distanceBetweenCardViews = self.minimumDistanceBetweenStackedCardViews
         

@@ -21,7 +21,6 @@ class BudgetList: UIView {
     var currentLayout: CardLayout? {
         didSet {
             self.currentLayout?.insert(cardViews: self.cardViews)
-            self.setContentInsets()
         }
     }
     
@@ -37,13 +36,20 @@ class BudgetList: UIView {
         return HorizontalCardLayout(scrollView: self.scrollView, budgetList: self)
     }()
     
+    lazy var verticalLayoutContentInset: UIEdgeInsets = {
+        return UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
+    }()
+    
+    lazy var horizontalLayoutContentInset: UIEdgeInsets = {
+        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+    }()
+    
     // MARK: Initialisation
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.setCardLayout()
         self.prepareScrollView()
-        self.setContentInsets()
         self.addObservers()
     }
     
@@ -51,20 +57,28 @@ class BudgetList: UIView {
         super.init(coder: coder)
         self.setCardLayout()
         self.prepareScrollView()
-        self.setContentInsets()
         self.addObservers()
     }
     
     private func setCardLayout() {
+        
         switch (traitCollection.verticalSizeClass, traitCollection.horizontalSizeClass) {
-        case (_, .compact):
+        case (.regular, .compact), (.compact, .compact):
+            
             self.currentLayout = self.verticalCardLayout
+            self.currentLayout?.contentInset = self.verticalLayoutContentInset
+            
             self.scrollView.alwaysBounceVertical = true
             self.scrollView.alwaysBounceHorizontal = false
-        case (.compact, _):
+            
+        case (.compact, .regular):
+            
             self.currentLayout = self.horizontalCardLayout
+            self.currentLayout?.contentInset = self.horizontalLayoutContentInset
+            
             self.scrollView.alwaysBounceVertical = false
             self.scrollView.alwaysBounceHorizontal = true
+        
         case (.regular, .regular):
             () // TODO: Grid / Split Layout
         default:
@@ -85,12 +99,6 @@ class BudgetList: UIView {
         self.scrollView.autoresizingMask = [.flexibleTopMargin, .flexibleLeftMargin, .flexibleHeight, .flexibleWidth]
         self.scrollView.frame = self.bounds
         
-    }
-    
-    private func setContentInsets() {
-        
-        
-        self.currentLayout?.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
     }
     
     
@@ -122,7 +130,7 @@ class BudgetList: UIView {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         
-        guard traitCollection != previousTraitCollection else {
+        if traitCollection.horizontalSizeClass == previousTraitCollection?.horizontalSizeClass && traitCollection.verticalSizeClass == previousTraitCollection?.verticalSizeClass {
             return
         }
         
