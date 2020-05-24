@@ -11,6 +11,7 @@ import UIKit
 class BudgetList: UIView {
 
     private let scrollView = UIScrollView()
+    private let detailsScrollView = UIScrollView()
 
     var cardViews: [CardView] = [] {
         didSet {
@@ -37,7 +38,7 @@ class BudgetList: UIView {
     }()
     
     lazy var gridCardLayout: GridLayout = {
-        return GridLayout(scrollView: self.scrollView, budgetList: self)
+        return GridLayout(scrollView: self.scrollView, detailsScrollView: self.detailsScrollView, budgetList: self)
     }()
     
     lazy var verticalLayoutContentInset: UIEdgeInsets = {
@@ -54,16 +55,16 @@ class BudgetList: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.setCardLayout()
-        self.prepareScrollView()
         self.addObservers()
+        self.prepareScrollView()
+        self.setCardLayout()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        self.setCardLayout()
-        self.prepareScrollView()
         self.addObservers()
+        self.prepareScrollView()
+        self.setCardLayout()
     }
     
     private func setCardLayout() {
@@ -71,7 +72,11 @@ class BudgetList: UIView {
         switch (traitCollection.verticalSizeClass, traitCollection.horizontalSizeClass) {
         case (.regular, .compact), (.compact, .compact):
             
+            let presentedCardView = self.currentLayout?.presentedCardView
+            
             self.currentLayout = self.verticalCardLayout
+            self.currentLayout?.presentedCardView = presentedCardView
+            
             self.currentLayout?.contentInset = self.verticalLayoutContentInset
             
             self.scrollView.alwaysBounceVertical = true
@@ -79,7 +84,11 @@ class BudgetList: UIView {
             
         case (.compact, .regular):
             
+            let presentedCardView = self.currentLayout?.presentedCardView
+            
             self.currentLayout = self.horizontalCardLayout
+            self.currentLayout?.presentedCardView = presentedCardView
+            
             self.currentLayout?.contentInset = self.horizontalLayoutContentInset
             
             self.scrollView.alwaysBounceVertical = false
