@@ -10,8 +10,35 @@ import UIKit
 
 class BudgetList: UIView {
 
-    private let scrollView = UIScrollView()
-    private let detailsScrollView = UIScrollView()
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        
+        scrollView.clipsToBounds = false
+        
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
+        
+        scrollView.backgroundColor = UIColor.black // debug
+        scrollView.accessibilityIdentifier = "scrollView" // debug
+        
+        return scrollView
+    }()
+    
+    private let detailsScrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
+        
+        scrollView.backgroundColor = UIColor.systemPink // debug
+        scrollView.accessibilityIdentifier = "detailsScrollView" // debug
+        
+        return scrollView
+    }()
 
     var cardViews: [CardView] = [] {
         didSet {
@@ -25,6 +52,14 @@ class BudgetList: UIView {
         }
     }
     
+    // MARK: Constraints
+    
+    private var scrollViewGridConstraints: [NSLayoutConstraint]?
+    private var scrollViewNormalConstraints: [NSLayoutConstraint]?
+    
+    // MARK: Miscellaneous Properties
+    
+    private var didLayoutSubViewsForTheFirstTime: Bool = false
     private static var observerContext = 0
     
     // MARK: Layout Properties
@@ -37,8 +72,8 @@ class BudgetList: UIView {
         return HorizontalCardLayout(scrollView: self.scrollView, budgetList: self)
     }()
     
-    lazy var gridCardLayout: GridLayout = {
-        return GridLayout(scrollView: self.scrollView, detailsScrollView: self.detailsScrollView, budgetList: self)
+    lazy var splitCardLayout: SplitLayout = {
+        return SplitLayout(scrollView: self.scrollView, detailsScrollView: self.detailsScrollView, budgetList: self)
     }()
     
     lazy var verticalLayoutContentInset: UIEdgeInsets = {
@@ -67,35 +102,72 @@ class BudgetList: UIView {
         self.setCardLayout()
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if !didLayoutSubViewsForTheFirstTime {
+            self.currentLayout?.calculateLayoutValues()
+        }
+    }
+    
+    private func prepareScrollView() {
+        
+        self.addSubview(self.scrollView)
+        
+        self.constrainScrollView()
+        
+    }
+    
+    // MARK: Layout
+    
     private func setCardLayout() {
         
         switch (traitCollection.verticalSizeClass, traitCollection.horizontalSizeClass) {
         case (.regular, .compact), (.compact, .compact):
             
+            // 1. Constrain scrollView if required
+            if let _ = self.currentLayout as? SplitLayout {
+                self.constrainScrollView()
+            }
+            
+            // 2. Set new layout and transfer presented view
             let presentedCardView = self.currentLayout?.presentedCardView
             
             self.currentLayout = self.verticalCardLayout
             self.currentLayout?.presentedCardView = presentedCardView
             
+            // 3. Set contentInset
             self.currentLayout?.contentInset = self.verticalLayoutContentInset
             
+            // 4. Set scrollView scrolling direction
             self.scrollView.alwaysBounceVertical = true
             self.scrollView.alwaysBounceHorizontal = false
             
         case (.compact, .regular):
             
+            // 1. Constrain scrollView if required
+            if let _ = self.currentLayout as? SplitLayout {
+                self.constrainScrollView()
+            }
+            
+            // 2. Set new layout and transfer presented view
             let presentedCardView = self.currentLayout?.presentedCardView
             
             self.currentLayout = self.horizontalCardLayout
             self.currentLayout?.presentedCardView = presentedCardView
             
+            // 3. Set contentInset
             self.currentLayout?.contentInset = self.horizontalLayoutContentInset
             
+            // 4. Set scrollView scrolling direction
             self.scrollView.alwaysBounceVertical = false
             self.scrollView.alwaysBounceHorizontal = true
         
         case (.regular, .regular):
-            self.currentLayout = self.gridCardLayout
+            
+            // 1. Constrain both scroll views as
+            self.constrainScrollViewsForGridLayout()
+            
+            self.currentLayout = self.splitCardLayout
             
         default:
             ()
@@ -103,20 +175,53 @@ class BudgetList: UIView {
         
     }
     
-    private func prepareScrollView() {
+    
+    private func constrainScrollView() {
         
-        self.addSubview(self.scrollView)
+        // remove detailsScrollView From superview
+        self.detailsScrollView.removeFromSuperview()
         
-        self.scrollView.clipsToBounds = false
+        NSLayoutConstraint.deactivate(self.scrollViewGridConstraints ?? [])
         
-        self.scrollView.showsHorizontalScrollIndicator = false
-        self.scrollView.showsVerticalScrollIndicator = false
+        if self.scrollViewNormalConstraints == nil {
+            self.scrollViewNormalConstraints = [
+                self.scrollView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
+                self.scrollView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
+                self.scrollView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
+                self.scrollView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
+            ]
+        }
         
-        self.scrollView.autoresizingMask = [.flexibleTopMargin, .flexibleLeftMargin, .flexibleHeight, .flexibleWidth]
-        self.scrollView.frame = self.bounds
+        NSLayoutConstraint.activate(scrollViewNormalConstraints ?? [])
         
     }
     
+    private func constrainScrollViewsForGridLayout() {
+        
+        NSLayoutConstraint.deactivate(self.scrollViewNormalConstraints ?? [])
+        
+        if self.scrollViewGridConstraints == nil {
+            self.scrollViewGridConstraints = [
+                self.scrollView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
+                self.scrollView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor),
+                self.scrollView.widthAnchor.constraint(equalTo: self.safeAreaLayoutGuide.widthAnchor, multiplier: 1/3),
+                self.scrollView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
+            ]
+        }
+        
+        NSLayoutConstraint.activate(self.scrollViewGridConstraints ?? [])
+        
+        self.addSubview(self.detailsScrollView)
+        
+        let detailsScrollViewConstraints = [
+            self.detailsScrollView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
+            self.detailsScrollView.leadingAnchor.constraint(equalTo: self.scrollView.trailingAnchor),
+            self.detailsScrollView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor),
+            self.detailsScrollView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
+        ]
+        
+        NSLayoutConstraint.activate(detailsScrollViewConstraints)
+    }
     
     // MARK: Observers
     
@@ -145,6 +250,8 @@ class BudgetList: UIView {
     // MARK: Handling Orientation Changes
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        
+        self.didLayoutSubViewsForTheFirstTime = true
         
         if traitCollection.horizontalSizeClass == previousTraitCollection?.horizontalSizeClass && traitCollection.verticalSizeClass == previousTraitCollection?.verticalSizeClass {
             return

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class GridLayout: CardLayout {
+class SplitLayout: CardLayout {
     
     private weak var budgetList: BudgetList?
     
