@@ -36,6 +36,10 @@ class BudgetList: UIView {
         return HorizontalCardLayout(scrollView: self.scrollView, budgetList: self)
     }()
     
+    lazy var gridCardLayout: GridLayout = {
+        return GridLayout(scrollView: self.scrollView, budgetList: self)
+    }()
+    
     lazy var verticalLayoutContentInset: UIEdgeInsets = {
         return UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
     }()
@@ -43,6 +47,8 @@ class BudgetList: UIView {
     lazy var horizontalLayoutContentInset: UIEdgeInsets = {
         return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }()
+    
+    
     
     // MARK: Initialisation
     
@@ -80,7 +86,8 @@ class BudgetList: UIView {
             self.scrollView.alwaysBounceHorizontal = true
         
         case (.regular, .regular):
-            () // TODO: Grid / Split Layout
+            self.currentLayout = self.gridCardLayout
+            
         default:
             ()
         }

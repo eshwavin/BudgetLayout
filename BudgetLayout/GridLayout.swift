@@ -13,6 +13,7 @@ class GridLayout: CardLayout {
     private weak var budgetList: BudgetList?
     
     weak var scrollView: UIScrollView?
+    var detailsScrollView = UIScrollView()
     
     var cardViews: [CardView] = [] {
         didSet {
@@ -69,10 +70,31 @@ class GridLayout: CardLayout {
     init(scrollView: UIScrollView, budgetList: BudgetList ) {
         self.scrollView = scrollView
         self.budgetList = budgetList
+        self.prepareScrollViews()
     }
     
     deinit {
         self.cardViews = []
+    }
+    
+    private func prepareScrollViews() {
+        guard let budgetList = budgetList, let scrollView = scrollView else {
+            return
+        }
+        
+        scrollView.frame = CGRect(x: budgetList.bounds.origin.x, y: budgetList.bounds.origin.y, width: budgetList.bounds.width / 3, height: budgetList.bounds.height)
+        
+        budgetList.addSubview(self.detailsScrollView)
+        
+        self.detailsScrollView.translatesAutoresizingMaskIntoConstraints = false
+        self.detailsScrollView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        self.detailsScrollView.leadingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        self.detailsScrollView.trailingAnchor.constraint(equalTo: budgetList.trailingAnchor).isActive = true
+        self.detailsScrollView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
+        
+        detailsScrollView.backgroundColor = UIColor.systemPink
+        
+        
     }
     
     // MARK: Layout
@@ -82,6 +104,10 @@ class GridLayout: CardLayout {
     }
     
     func updateScrollViewContentSize() {
+        
+    }
+    
+    func layoutCards(animationDuration: TimeInterval? = nil, animationOptions: UIView.KeyframeAnimationOptions = [.beginFromCurrentState, .calculationModeCubic], placeVisibleCardViews: Bool = true, completion: ((Bool) -> ())? = nil) {
         
     }
     
