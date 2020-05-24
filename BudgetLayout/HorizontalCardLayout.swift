@@ -79,7 +79,6 @@ class HorizontalCardLayout: CardLayout {
     
     // MARK: Setup
     
-    
     init(scrollView: UIScrollView, budgetList: BudgetList ) {
         self.scrollView = scrollView
         self.budgetList = budgetList
